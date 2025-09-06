@@ -1,0 +1,28 @@
+{
+  "name": "my-ai-e2e-agent",
+  "version": "1.0.0",
+  "description": "Ce projet vise à créer un **agent IA de test E2E** capable de : - Analyser une page web - Comprendre un objectif (ex : \"inscrire un utilisateur\") - Exécuter dynamiquement les actions nécessaires (remplir, cliquer, naviguer) - Vérifier le résultat final",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "agent": "ts-node src/agent.ts",
+    "postinstall": "playwright install"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^17.2.2",
+    "openai": "^5.19.1",
+    "playwright": "^1.55.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}
