@@ -1,15 +1,17 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 
+import { Action } from '../types/action';
+
 type AgentRunLog = {
   prompt: string;
   response: string;
-  actions: any[];
+  actions: Action[];
   success: boolean;
   timestamp: string;
 };
 
-export async function writeAgentLog(data: AgentRunLog) {
+export const writeAgentLog = async (data: AgentRunLog) => {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const filePath = path.join('logs', `agent-result-${timestamp}.json`);
 
@@ -21,7 +23,7 @@ export async function writeAgentLog(data: AgentRunLog) {
   }
 }
 
-export async function writeErrorLog(err: unknown, context: Partial<AgentRunLog> = {}) {
+export const writeErrorLog = async (err: unknown, context: AgentRunLog) => {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const filePath = path.join('logs', `agent-error-${timestamp}.json`);
 
@@ -30,7 +32,7 @@ export async function writeErrorLog(err: unknown, context: Partial<AgentRunLog> 
     success: false,
     timestamp: new Date().toISOString(),
     error: err instanceof Error ? err.message : String(err),
-    stack: err instanceof Error ? err.stack : undefined
+    stack: err instanceof Error ? err.stack : undefined,
   };
 
   try {
@@ -40,4 +42,3 @@ export async function writeErrorLog(err: unknown, context: Partial<AgentRunLog> 
     console.error('❌ Erreur lors de l’écriture du log d’erreur :', writeErr);
   }
 }
-
