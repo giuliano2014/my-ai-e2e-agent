@@ -4,7 +4,9 @@ import fs from 'fs';
 import path from 'path';
 import { Page } from 'playwright'; // facultatif mais utile pour l’auto-complétion
 
-export async function takeScreenshot(page: Page, index: number, action: any) {
+import { Action } from '../types/action';
+
+export const takeScreenshot = async (page: Page, index: number, action: Action) => {
   const safeSelector = action.selector.replace(/[^a-zA-Z0-9]/g, '-').slice(0, 50);
   const fileName = `step-${index + 1}-${action.type}-${safeSelector}.png`;
   const filePath = path.join('screenshots', fileName);
@@ -18,7 +20,7 @@ export async function takeScreenshot(page: Page, index: number, action: any) {
   console.log(`📸 Screenshot sauvegardé → ${filePath}`);
 }
 
-export function clearScreenshots() {
+export const clearScreenshots = () => {
   const dir = path.join('screenshots');
 
   if (!fs.existsSync(dir)) {
@@ -33,7 +35,7 @@ export function clearScreenshots() {
   console.log('🧹 Dossier screenshots/ nettoyé');
 }
 
-export async function takeErrorScreenshot(page: Page, label = '') {
+export const takeErrorScreenshot = async (page: Page, label?: string) => {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const suffix = label ? `-${label}` : '';
   const filePath = path.join('screenshots', `error-${timestamp}${suffix}.png`);

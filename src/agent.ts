@@ -1,5 +1,5 @@
-import { chromium } from 'playwright';
 import * as dotenv from 'dotenv';
+import { chromium } from 'playwright';
 import { askGPT } from './model';
 import { createLoginPrompt } from './prompt';
 import { writeAgentLog, writeErrorLog } from './utils/log';
@@ -18,7 +18,7 @@ if (!TARGET_URL || !LOGIN_EMAIL || !LOGIN_PASSWORD) {
 clearScreenshots();
 
 // 2. Ensuite l’agent démarre
-async function runAgent() {
+const runAgent = async () => {
   console.log('🤖 Lancement de l’agent IA de test E2E...');
   const browser = await chromium.launch({ headless: false });
   const page = await browser.newPage();
@@ -32,11 +32,12 @@ async function runAgent() {
 
     // ✅ INSERTION DU BLOC ICI ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
     const html = await page.content(); // 1. Récupère le DOM
-    prompt = createLoginPrompt(html, LOGIN_EMAIL as string, LOGIN_PASSWORD as string); // 2. Crée le prompt
+    // prompt = createLoginPrompt(html, LOGIN_EMAIL as string, LOGIN_PASSWORD as string); // 2. Crée le prompt
+    prompt = createLoginPrompt(html); // 2. Crée le prompt
     response = await askGPT(prompt); // 3. Appelle GPT
 
     // 🧠 Affiche la réponse brute de GPT dans le terminal
-    console.log("🧠 Réponse brute GPT :\n", response);
+    console.log('🧠 Réponse brute GPT :\n', response);
 
     const actions = JSON.parse(response); // 4. Convertit la réponse JSON
     // ✅ FIN DE L’INSERTION ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
@@ -67,18 +68,19 @@ async function runAgent() {
       response,
       actions,
       success: true,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     console.log('✅ Connexion tentée avec succès.');
-
   } catch (err) {
     console.error('❌ Erreur lors de l’exécution de l’agent :', err);
 
     await writeErrorLog(err, {
       prompt,
       response: response || '',
-      actions: []
+      actions: [],
+      success: false,
+      timestamp: new Date().toISOString(),
     });
   } finally {
     await browser.close();
@@ -86,4 +88,3 @@ async function runAgent() {
 }
 
 runAgent();
-

@@ -89,27 +89,27 @@
 // `;
 // }
 
-export function createLoginPrompt(dom: string, email: string, password: string): string {
+export const createLoginPrompt = (dom: string): string => {
   return `
-Tu es un agent E2E intelligent. Tu interagis avec une interface utilisateur pour accepter les cookies.
+    Tu es un agent E2E intelligent. Tu interagis avec une interface utilisateur pour accepter les cookies.
 
-Voici le **but à atteindre** :
-1. Cliquer sur le bouton, dont le texte est "Accepter & Fermer", qui se trouve dans la modal de cookies, au la page.
+    Voici le **but à atteindre** :
+      1. Cliquer sur le bouton, dont le texte est "Accepter & Fermer", qui se trouve dans la modal de cookies, au la page.
 
-**Consignes importantes** :
-- Lis bien le HTML fourni.
-- N’invente rien. Base-toi sur les "placeholder", "aria-label", "text", "name", "id", "class" ou "type".
-- Utilise des sélecteurs CSS valides.
-- Réponds uniquement en JSON. Ne donne aucun commentaire.
-- Si plusieurs boutons sont possibles, choisis le premier.
-- Tu peux utiliser "text=" comme sélecteur si un bouton a un texte visible.
+    **Consignes importantes** :
+      - Lis bien le HTML fourni.
+      - N’invente rien. Base-toi sur les "placeholder", "aria-label", "text", "name", "id", "class" ou "type".
+      - Utilise des sélecteurs CSS valides.
+      - Réponds uniquement en JSON. Ne donne aucun commentaire.
+      - Si plusieurs boutons sont possibles, choisis le premier.
+      - Tu peux utiliser "text=" comme sélecteur si un bouton a un texte visible.
 
-Voici le DOM à analyser :
-${dom}
+    Voici le DOM à analyser :
+      ${dom}
 
-Réponds avec un tableau JSON d’actions à exécuter, comme ceci :
-[
-  { "type": "click", "selector": "button[aria-label='Accepter & Fermer']" },
-]
-`;
+    Réponds avec un tableau JSON d’actions à exécuter, comme ceci :
+      [
+        { "type": "click", "selector": "button[aria-label='Accepter & Fermer']" },
+      ]
+  `;
 }
