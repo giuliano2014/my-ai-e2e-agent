@@ -1,9 +1,10 @@
-const App = () => {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <h1 className="text-3xl font-bold text-blue-600">✅ Tailwind fonctionne !</h1>
-    </div>
-  );
-};
+import { Button } from "@/components/ui/button";
 
-export default App;
+export default function App() {
+  return (
+    <main className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Hello Shadcn 👋</h1>
+      <Button>Je suis un bouton stylé ✨</Button>
+    </main>
+  );
+}
