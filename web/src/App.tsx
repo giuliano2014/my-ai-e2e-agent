@@ -1,12 +1,7 @@
 const App = () => {
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold">
-        🤖 Agent IA de test E2E
-      </h1>
-      <p className="text-center">
-        Cette application vous permet de tester l'efficacité de votre site web en utilisant l'IA de test E2E.
-      </p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <h1 className="text-3xl font-bold text-blue-600">✅ Tailwind fonctionne !</h1>
     </div>
   );
 };
