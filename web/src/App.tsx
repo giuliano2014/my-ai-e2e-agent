@@ -1,10 +1,9 @@
-import { Button } from "@/components/ui/button";
+import TestPage from "./pages/TestPage";
 
-export default function App() {
+const App = () => {
   return (
-    <main className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Hello Shadcn 👋</h1>
-      <Button>Je suis un bouton stylé ✨</Button>
-    </main>
+      <TestPage />
   );
 }
+
+export default App;  
