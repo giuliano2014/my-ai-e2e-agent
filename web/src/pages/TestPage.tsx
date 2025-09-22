@@ -1,3 +1,4 @@
+import { RunAgentButton } from '@/components/RunAgentButton';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { askGPT } from '@/hooks/useGPT';
@@ -22,6 +23,7 @@ export default function TestPage() {
   };
 
   return (
+    <>
     <div className="max-w-xl mx-auto py-12 px-4">
       <h1 className="text-3xl font-bold mb-6">🧪 Lancer un test E2E</h1>
 
@@ -44,5 +46,10 @@ export default function TestPage() {
         </div>
       )}
     </div>
+    <div className="p-6">
+      <h1 className="text-xl font-bold mb-4">🧪 Test de l’Agent IA</h1>
+      <RunAgentButton />
+    </div>
+    </>
   );
 }
