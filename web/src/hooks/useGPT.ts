@@ -7,11 +7,13 @@ const openai = createOpenAI({
   apiKey,
 });
 
-export async function askGPT(prompt: string): Promise<string> {
+const askGPT = async (prompt: string): Promise<string> => {
   const { text } = await generateText({
-    model: openai.chat('gpt-3.5-turbo'), // ← tu peux aussi tester 'gpt-4'
+    model: openai.chat('gpt-3.5-turbo'),
     prompt,
   });
 
   return text;
 }
+
+export { askGPT };

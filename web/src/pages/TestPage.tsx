@@ -1,13 +1,13 @@
-import { RunAgentButton } from '@/components/RunAgentButton';
+import RunAgentButton from '@/components/RunAgentButton';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { askGPT } from '@/hooks/useGPT';
 import { useState } from 'react';
 
-export default function TestPage() {
+const TestPage = () => {
+  const [loading, setLoading] = useState(false);
   const [prompt, setPrompt] = useState('');
   const [response, setResponse] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -26,18 +26,15 @@ export default function TestPage() {
     <>
     <div className="max-w-xl mx-auto py-12 px-4">
       <h1 className="text-3xl font-bold mb-6">🧪 Lancer un test E2E</h1>
-
       <Textarea
         placeholder="Décris ton test E2E ici..."
         className="min-h-[120px] mb-4"
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
       />
-
       <Button onClick={handleSubmit} disabled={!prompt.trim() || loading}>
         {loading ? '⏳ En cours...' : '🚀 Lancer le test'}
       </Button>
-
       {response && (
         <div className="mt-6 p-4 border rounded-md bg-muted text-sm whitespace-pre-wrap">
           <strong>Réponse GPT :</strong>
@@ -52,4 +49,6 @@ export default function TestPage() {
     </div>
     </>
   );
-}
+};
+
+export default TestPage;

@@ -1,11 +1,10 @@
-// src/components/RunAgentButton.tsx
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 
-export function RunAgentButton() {
+const RunAgentButton = () => {
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   const handleRunAgent = async () => {
     setLoading(true);
@@ -41,4 +40,6 @@ export function RunAgentButton() {
       {error && <p className="text-red-600">{error}</p>}
     </div>
   );
-}
+};
+
+export default RunAgentButton;

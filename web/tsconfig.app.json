@@ -18,8 +18,6 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-
-    // ✅ AJOUTER CES LIGNES :
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
