@@ -87,4 +87,4 @@ const runAgent = async () => {
   }
 }
 
-runAgent();
+export { runAgent };
