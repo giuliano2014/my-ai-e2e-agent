@@ -1,8 +1,6 @@
-// src/utils/screenshot.ts
-
 import fs from 'fs';
 import path from 'path';
-import { Page } from 'playwright'; // facultatif mais utile pour l’auto-complétion
+import { Page } from 'playwright'; // Optional but useful for auto-completion
 
 import { Action } from '../types/action';
 
@@ -11,13 +9,13 @@ export const takeScreenshot = async (page: Page, index: number, action: Action) 
   const fileName = `step-${index + 1}-${action.type}-${safeSelector}.png`;
   const filePath = path.join('screenshots', fileName);
 
-  // Crée le dossier s’il n’existe pas
+  // Create the folder if it doesn't exist
   if (!fs.existsSync('screenshots')) {
     fs.mkdirSync('screenshots');
   }
 
   await page.screenshot({ path: filePath, fullPage: true });
-  console.log(`📸 Screenshot sauvegardé → ${filePath}`);
+  console.log(`📸 Screenshot saved → ${filePath}`);
 }
 
 export const clearScreenshots = () => {
@@ -32,7 +30,7 @@ export const clearScreenshots = () => {
     fs.unlinkSync(path.join(dir, file));
   }
 
-  console.log('🧹 Dossier screenshots/ nettoyé');
+  console.log('🧹 Screenshots folder cleaned');
 }
 
 export const takeErrorScreenshot = async (page: Page, label?: string) => {
@@ -45,5 +43,5 @@ export const takeErrorScreenshot = async (page: Page, label?: string) => {
   }
 
   await page.screenshot({ path: filePath, fullPage: true });
-  console.log(`📸 Screenshot d’erreur capturé → ${filePath}`);
+  console.log(`📸 Screenshot of error captured → ${filePath}`);
 }
