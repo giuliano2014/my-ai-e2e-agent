@@ -8,6 +8,8 @@ import { runAgent } from '../src/agent';
 const app = express();
 const LOGS_DIR = path.join(__dirname, '../logs');
 const PORT = 3001;
+// Use process.cwd() to be sure to be at the root of the project
+const SCREENSHOTS_DIR = path.join(process.cwd(), 'screenshots');
 
 app.use(cors());
 app.use(express.json());
@@ -51,6 +53,9 @@ app.post('/api/run-agent', async (req, res) => { // @TODO: Just for testing loca
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+// Static route for serving images
+app.use('/api/screenshots', express.static(SCREENSHOTS_DIR));
 
 // Start the server
 app.listen(PORT, () => {
