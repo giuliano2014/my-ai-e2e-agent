@@ -5,6 +5,12 @@ import { createLoginPrompt } from './prompt';
 import { writeAgentLog, writeErrorLog } from './utils/log';
 import { clearScreenshots, takeErrorScreenshot, takeScreenshot } from './utils/screenshot';
 
+type AgentAction = {
+  type: 'click' | 'fill';
+  selector: string;
+  value?: string;
+};
+
 dotenv.config();
 
 const { TARGET_URL, LOGIN_EMAIL, LOGIN_PASSWORD } = process.env;
@@ -25,66 +31,76 @@ const runAgent = async () => {
 
   let prompt = '';
   let response = '';
+  let actions: AgentAction[] = [];
+  let hasError = false;
 
   try {
-    // 🧭 Étape 1 : ouvrir la page
     await page.goto(TARGET_URL as string, { waitUntil: 'load' });
 
-    // ✅ INSERTION DU BLOC ICI ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-    const html = await page.content(); // 1. Récupère le DOM
-    // prompt = createLoginPrompt(html, LOGIN_EMAIL as string, LOGIN_PASSWORD as string); // 2. Crée le prompt
-    prompt = createLoginPrompt(html); // 2. Crée le prompt
-    response = await askGPT(prompt); // 3. Appelle GPT
-
-    // 🧠 Affiche la réponse brute de GPT dans le terminal
+    const html = await page.content();
+    prompt = createLoginPrompt(html);
+    response = await askGPT(prompt);
     console.log('🧠 Réponse brute GPT :\n', response);
 
-    const actions = JSON.parse(response); // 4. Convertit la réponse JSON
-    // ✅ FIN DE L’INSERTION ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+    actions = JSON.parse(response);
 
-    // 🧠 Étape 2 : exécuter les actions
     for (const action of actions) {
       console.log(`➡️ Action : ${action.type} sur ${action.selector}`);
-
+    
       try {
+        // Optimize for POC version
         if (action.type === 'fill') {
-          await page.fill(action.selector, action.value);
+          await page.fill(action.selector, action.value ?? '');
         } else if (action.type === 'click') {
           await page.click(action.selector);
         }
 
+        // // Optimize for SaaS version
+        // if (action.type === 'fill') {
+        //   if (action.value === undefined) {
+        //     console.error(`❌ Action "fill" sans value pour ${action.selector}`);
+        //     hasError = true;
+        //     continue;
+        //   }
+        //   await page.fill(action.selector, action.value);
+        // } else if (action.type === 'click') {
+        //   await page.click(action.selector);
+        // }        
+    
         await takeScreenshot(page, actions.indexOf(action), action);
       } catch (err) {
+        hasError = true;
         console.error(`❌ Action échouée : ${action.type} sur ${action.selector}`, err);
-
-        // 👉 Capture une erreur visuelle
         await takeErrorScreenshot(page, `${action.type}-${actions.indexOf(action)}`);
       }
     }
 
-    // ✅ INSERTION DU LOG DE L’AGENT
     await writeAgentLog({
       prompt,
       response,
       actions,
-      success: true,
+      success: !hasError,
       timestamp: new Date().toISOString(),
     });
 
-    console.log('✅ Connexion tentée avec succès.');
+    console.log(!hasError ? '✅ Connexion tentée avec succès.' : '⚠️ Connexion avec erreurs.');
+
+    return { success: !hasError, prompt, response, actions };
   } catch (err) {
-    console.error('❌ Erreur lors de l’exécution de l’agent :', err);
+    console.error('❌ Erreur critique :', err);
 
     await writeErrorLog(err, {
       prompt,
       response: response || '',
-      actions: [],
+      actions,
       success: false,
       timestamp: new Date().toISOString(),
     });
+
+    return { success: false, prompt, response, actions, error: (err as Error).message };
   } finally {
     await browser.close();
   }
-}
+};
 
 export { runAgent };

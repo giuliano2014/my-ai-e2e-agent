@@ -10,18 +10,20 @@ const RunAgentButton = () => {
     setLoading(true);
     setResult(null);
     setError(null);
-
+  
     try {
       const response = await fetch('http://localhost:3001/api/run-agent', {
         method: 'POST',
       });
-
+  
       const data = await response.json();
-
-      if (data.success) {
+  
+      if (response.ok && data.success) {
         setResult('✅ Agent lancé avec succès');
+      } else if (!data.success && data.actions?.length) {
+        setResult('⚠️ Agent exécuté avec des erreurs. Vérifie les logs/screenshots.');
       } else {
-        setError(`❌ Erreur : ${data.error}`);
+        setError(`❌ Erreur critique : ${data.error || 'Erreur inconnue'}`);
       }
     } catch (err) {
       setError(`❌ Erreur réseau : ${(err as Error).message}`);
@@ -29,6 +31,7 @@ const RunAgentButton = () => {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="space-y-4">
