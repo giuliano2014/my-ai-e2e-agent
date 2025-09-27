@@ -1,3 +1,4 @@
+import AgentLogsViewer from '@/components/AgentLogsViewer';
 import RunAgentButton from '@/components/RunAgentButton';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -46,6 +47,10 @@ const TestPage = () => {
     <div className="p-6">
       <h1 className="text-xl font-bold mb-4">🧪 Test de l’Agent IA</h1>
       <RunAgentButton />
+    </div>
+    <div className="p-6">
+      <h1 className="text-xl font-bold mb-4">🧪 Logs de retour de l’Agent IA</h1>
+      <AgentLogsViewer />
     </div>
     </>
   );
