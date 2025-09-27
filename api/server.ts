@@ -11,18 +11,23 @@ app.use(express.json());
 
 // Endpoint to run the agent 
 app.post('/api/run-agent', async (req, res) => { // @TODO: Just for testing locally API replace ".post" with ".get"
-  console.log('🛰️  Requête reçue sur /api/run-agent');
-
   try {
     const result = await runAgent();
-    res.status(200).json({ success: true, result });
+
+    if (!result.success) {
+      console.warn('⚠️ Errors during the agent execution.');
+      return res.status(500).json(result);
+    }
+
+    res.status(200).json(result);
   } catch (error) {
-    console.error('❌ Erreur lors de l’exécution de l’agent :', error);
-    res.status(500).json({ success: false, error: (error as Error).message });
+    console.error('❌ Critical server error:', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
+
 // Start the server
 app.listen(PORT, () => {
-  console.log(`🚀 API lancée sur http://localhost:${PORT}/api/run-agent`);
+  console.log(`🚀 API launched on http://localhost:${PORT}/api/run-agent`);
 });

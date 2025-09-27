@@ -4,9 +4,9 @@ import path from 'path';
 import { Action } from '../types/action';
 
 type AgentRunLog = {
+  actions: Action[];
   prompt: string;
   response: string;
-  actions: Action[];
   success: boolean;
   timestamp: string;
 };
@@ -17,9 +17,9 @@ export const writeAgentLog = async (data: AgentRunLog) => {
 
   try {
     await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
-    console.log(`📝 Log écrit dans ${filePath}`);
+    console.log(`📝 Log written to ${filePath}`);
   } catch (err) {
-    console.error('❌ Erreur lors de l’écriture du log :', err);
+    console.error('❌ Error writing log:', err);
   }
 }
 
@@ -37,8 +37,8 @@ export const writeErrorLog = async (err: unknown, context: AgentRunLog) => {
 
   try {
     await fs.writeFile(filePath, JSON.stringify(errorLog, null, 2), 'utf-8');
-    console.log(`🪵 Log d’erreur écrit dans ${filePath}`);
+    console.log(`🪵 Log error written to ${filePath}`);
   } catch (writeErr) {
-    console.error('❌ Erreur lors de l’écriture du log d’erreur :', writeErr);
+    console.error('❌ Errors writing error log:', writeErr);
   }
 }

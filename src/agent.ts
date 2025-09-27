@@ -5,86 +5,108 @@ import { createLoginPrompt } from './prompt';
 import { writeAgentLog, writeErrorLog } from './utils/log';
 import { clearScreenshots, takeErrorScreenshot, takeScreenshot } from './utils/screenshot';
 
+type AgentAction = {
+  selector: string;
+  type: 'click' | 'fill';
+  value?: string;
+};
+
 dotenv.config();
 
+// @TODO: Remode unused variables
 const { TARGET_URL, LOGIN_EMAIL, LOGIN_PASSWORD } = process.env;
 
+// @TODO: Remode unused variables
 if (!TARGET_URL || !LOGIN_EMAIL || !LOGIN_PASSWORD) {
-  console.error('❌ Variables manquantes dans le fichier .env');
+  console.error('❌ Missing variables in the .env file');
   process.exit(1);
 }
 
-// 1. Nettoyage dès le lancement du fichier
+// 1. Cleanup at the start of the file. Remove all screenshots.
 clearScreenshots();
 
-// 2. Ensuite l’agent démarre
+// 2. Then the agent starts
 const runAgent = async () => {
-  console.log('🤖 Lancement de l’agent IA de test E2E...');
+  console.log('🤖 Starting the E2E test AI agent...');
+
   const browser = await chromium.launch({ headless: false });
   const page = await browser.newPage();
 
+  let actions: AgentAction[] = [];
+  let hasError = false;
   let prompt = '';
   let response = '';
 
   try {
-    // 🧭 Étape 1 : ouvrir la page
     await page.goto(TARGET_URL as string, { waitUntil: 'load' });
 
-    // ✅ INSERTION DU BLOC ICI ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-    const html = await page.content(); // 1. Récupère le DOM
-    // prompt = createLoginPrompt(html, LOGIN_EMAIL as string, LOGIN_PASSWORD as string); // 2. Crée le prompt
-    prompt = createLoginPrompt(html); // 2. Crée le prompt
-    response = await askGPT(prompt); // 3. Appelle GPT
+    const html = await page.content();
+    prompt = createLoginPrompt(html);
+    response = await askGPT(prompt);
 
-    // 🧠 Affiche la réponse brute de GPT dans le terminal
-    console.log('🧠 Réponse brute GPT :\n', response);
+    console.log('🧠 Response from GPT:\n', response);
 
-    const actions = JSON.parse(response); // 4. Convertit la réponse JSON
-    // ✅ FIN DE L’INSERTION ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+    actions = JSON.parse(response);
 
-    // 🧠 Étape 2 : exécuter les actions
     for (const action of actions) {
-      console.log(`➡️ Action : ${action.type} sur ${action.selector}`);
-
+      console.log(`➡️ Action : ${action.type} on ${action.selector}`);
+    
       try {
+        // Optimize for POC version
         if (action.type === 'fill') {
-          await page.fill(action.selector, action.value);
+          await page.fill(action.selector, action.value ?? '');
         } else if (action.type === 'click') {
           await page.click(action.selector);
         }
 
+        // // Optimize for SaaS version
+        // if (action.type === 'fill') {
+        //   if (action.value === undefined) {
+        //     console.error(`❌ Action "fill" sans value pour ${action.selector}`);
+        //     hasError = true;
+        //     continue;
+        //   }
+        //   await page.fill(action.selector, action.value);
+        // } else if (action.type === 'click') {
+        //   await page.click(action.selector);
+        // }        
+    
         await takeScreenshot(page, actions.indexOf(action), action);
       } catch (err) {
-        console.error(`❌ Action échouée : ${action.type} sur ${action.selector}`, err);
-
-        // 👉 Capture une erreur visuelle
+        hasError = true;
+        console.error(`❌ Action failed: ${action.type} on ${action.selector}`, err);
         await takeErrorScreenshot(page, `${action.type}-${actions.indexOf(action)}`);
       }
     }
 
-    // ✅ INSERTION DU LOG DE L’AGENT
     await writeAgentLog({
+      actions,
       prompt,
       response,
-      actions,
-      success: true,
+      success: !hasError,
       timestamp: new Date().toISOString(),
     });
 
-    console.log('✅ Connexion tentée avec succès.');
+    console.log(!hasError ? '✅ Login attempt succeeded.' : '⚠️ Login attempt failed.');
+
+    return { success: !hasError, prompt, response, actions };
+    // return { actions, prompt, response, success: !hasError };
   } catch (err) {
-    console.error('❌ Erreur lors de l’exécution de l’agent :', err);
+    console.error('❌ Critical error:', err);
 
     await writeErrorLog(err, {
+      actions,
       prompt,
       response: response || '',
-      actions: [],
       success: false,
       timestamp: new Date().toISOString(),
     });
+
+    return { success: false, prompt, response, actions, error: (err as Error).message };
+    // return { actions, error: (err as Error).message, prompt, response, success: false };
   } finally {
     await browser.close();
   }
-}
+};
 
 export { runAgent };
